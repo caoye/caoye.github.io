@@ -1,5 +1,428 @@
-extends views/index
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>CYZoor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="CYZoor">
+<meta property="og:url" content="http://yoursite.com/index.html">
+<meta property="og:site_name" content="CYZoor">
+<meta property="og:locale" content="zh-Hans">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CYZoor">
+  
+    <link rel="alternate" href="/atom.xml" title="CYZoor" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
 
-block head
-  title
-    = config.title
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">CYZoor</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Cocoapods镜像制作" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/18/Cocoapods镜像制作/" class="article-date">
+  <time datetime="2017-11-18T14:58:54.000Z" itemprop="datePublished">2017-11-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/18/Cocoapods镜像制作/">Cocoapods镜像制作</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>项目开发过程中避免不了使用第三方，常用的第三方包管理工具有<code>Carthage</code>、<code>Package Manager</code>、<code>Cocoapods</code>,目前为止<code>Cocoapods</code>的使用范围比较广，由于是从远程仓库托管到了github上，导致拉取更新比较慢，尤其是用<code>Cocoapods</code>做项目插件化的项目， <code>pod update</code>、<code>pod install</code>的频率比较高，制作一套自己的<code>Cocoapods</code>镜像是比较合适的选择。</p>
+<p>先说一下我自己的方案：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">我们都知道`Cocoapods `的repo被托管到了github，我们可以将它克隆到本地，把这个</span><br><span class="line">repo定时更新并推到自己服务器上，把项目中依赖的源修改成我们自己服务器上镜像地址。</span><br></pre></td></tr></table></figure></p>
+<p>我们先安装<a href="https://cocoapods.org" target="_blank" rel="noopener">Cocoapods</a>，安装方法可参考其他博文的<a href="http://www.jianshu.com/p/f43b5964f582" target="_blank" rel="noopener">安装方法</a></p>
+<ol>
+<li>我们先拉取官方库裸库到本地<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git --bare https://github.com/CocoaPods/Specs.git</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>push镜像到我们自己git服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git push --mirror git@code.ds.gome.com.cn:Aeromind-iOS/Specs.git</span><br></pre></td></tr></table></figure>
+<p>我们通过命令打开本地repo仓库<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cd ~/.cocoapods/repos</span><br><span class="line">$ open .</span><br></pre></td></tr></table></figure></p>
+<p>会发现存在一个<code>master</code>分支的仓库,在这个<code>master</code>这个仓库里我们能看到fetch和push的地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v</span><br><span class="line">结果:</span><br><span class="line">origin    https://github.com/CocoaPods/Specs.git (fetch)</span><br><span class="line">origin    https://github.com/CocoaPods/Specs.git (push)</span><br></pre></td></tr></table></figure></p>
+<p>我们看到这个库的fetch和push的地址都是github，我们要把这个master分之作为一个官方库和我们自己服务器镜像库同步的一个桥梁，那么我们接下来需要做一些工作</p>
+<p>进入master文件夹，其中有个隐藏文件<code>.git</code>，我们可以通过显示隐藏文件或者命令找到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cd ~/.cocoapods/repos/master/.git</span><br><span class="line">$ open .</span><br></pre></td></tr></table></figure></p>
+<p>在里面会发现有个<code>config</code>文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi config</span><br></pre></td></tr></table></figure></p>
+<p>我们需要在config文件中将push的地址变为我们自己服务器的地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">[core]</span><br><span class="line">repositoryformatversion = 0</span><br><span class="line">filemode = true</span><br><span class="line">bare = false</span><br><span class="line">logallrefupdates = true</span><br><span class="line">ignorecase = true</span><br><span class="line">precomposeunicode = true</span><br><span class="line">[remote &quot;origin&quot;]</span><br><span class="line">url = https://github.com/CocoaPods/Specs.git</span><br><span class="line">fetch = +refs/heads/*:refs/remotes/origin/*</span><br><span class="line">[branch &quot;master&quot;]</span><br><span class="line">remote = origin</span><br><span class="line">merge = refs/heads/master</span><br><span class="line">pushurl = git@code.ds.code.gome.com.cn:Aeromin-iOS/Specs.git</span><br></pre></td></tr></table></figure></p>
+<p>在master分支再次查看远端地址<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ git remote -v</span><br><span class="line">结果：</span><br><span class="line">origin    https://github.com/CocoaPods/Specs.git (fetch)</span><br><span class="line">origin    git@code.ds.code.gome.com.cn:Aeromin-iOS/Specs.git (push)</span><br></pre></td></tr></table></figure></p>
+<p>OK，这要我们修改成功了，我们接下来需要做的事就定时去拉取github上的更新，并push到我们自己的服务器上。</p>
+<p>我是在github上配置了ssh，建议自己git服务器和github都配上ssh，这样git不会受密码变动影响。</p>
+<p>接下来开始写个简单定时任务脚本<br>创建一个<code>mirror_sync.sh</code>的文件，然后将这个文件变成可执行文件，文件内容为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># !/bin/sh</span><br><span class="line"></span><br><span class="line">cd ~/.cocoapods/repos/master</span><br><span class="line">git pull origin master</span><br><span class="line">echo &apos;\033[31m ********* pull finish ^_^ ******** \033[0m&apos;</span><br><span class="line">git push --mirror</span><br><span class="line">echo &apos;\033[31m ********* push finish ^_^ ******** \033[0m&apos;</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ chmod +x mirror_sync.sh</span><br></pre></td></tr></table></figure>
+<p>创建一个log文件<code>mirror_sync.log</code>存储log</p>
+<p>添加crontab定时任务<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ crontab -e</span><br><span class="line">添加内容：</span><br><span class="line">* */2 * * * ~/mirror_shell/mirror_sync.sh &gt; ~/mirror_shell/mirror_sync.log 2&gt;&amp;1</span><br></pre></td></tr></table></figure></p>
+<p>两小时更新一次，这样镜像就基本制作完毕了。</p>
+<p>最后使用的时候我们需要在<code>podfile</code>里把源替换掉<br><img src="http://upload-images.jianshu.io/upload_images/9045592-13790b0eaa2057ee.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/18/Cocoapods镜像制作/" data-id="cja5jiq3j0001sojez3k9fvh7" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Framework脚本打包并分发(针对framework依赖了其他包的基础上)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/18/Framework脚本打包并分发(针对framework依赖了其他包的基础上)/" class="article-date">
+  <time datetime="2017-11-18T14:58:54.000Z" itemprop="datePublished">2017-11-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/18/Framework脚本打包并分发(针对framework依赖了其他包的基础上)/">Framework脚本打包并分发(针对framework依赖了其他包的基础上)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>开发framework的时候我们会碰到这种情况，framework又依赖了其他的target,类似这样<br><img src="http://upload-images.jianshu.io/upload_images/9045592-032b06e154429919.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照"></p>
+<p>也就是说，当我们想编译CYFrame的时候首先得编译OOO才可以，针对这样的情况我们来写一个脚本来自动进行打包，并发邮件。</p>
+<p>我们首先看一下文档说明<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ man xcodebuild</span><br></pre></td></tr></table></figure></p>
+<p>在最下面的<code>EXAMPLES</code>里看到了多个target的打包命令<br><img src="http://upload-images.jianshu.io/upload_images/9045592-f6f6eadc772c580a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照"></p>
+<p>然后我们根据这个思路去实现一个脚本，我们先创建一个<code>framework.sh</code>空文件，然后将它变为一个可执行的脚本：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ chmod +x framework.sh</span><br></pre></td></tr></table></figure></p>
+<p>脚本内容<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"># 需自己配置（project名字）</span><br><span class="line">FRAMEWORK_NAME=&quot;CYFrame&quot;</span><br><span class="line">SUB_FRAMEWORK_NAME=&quot;OOO&quot;</span><br><span class="line"># 邮件title</span><br><span class="line">email_title=&quot;客户端SDK更新&quot;</span><br><span class="line"># 邮件内容</span><br><span class="line">email_content=&quot;更新了SDK，谢谢!&quot;</span><br><span class="line"># 接受者邮箱</span><br><span class="line">email_reciver=xxxxxx@163.com</span><br><span class="line"># 发送者邮箱</span><br><span class="line">email_sender=xxxxxx@163.com</span><br><span class="line"># 邮箱用户名</span><br><span class="line">email_username=zhangsan</span><br><span class="line"># 邮箱密码</span><br><span class="line">email_password=xxxxxx</span><br><span class="line"># smtp服务器地址</span><br><span class="line">email_smtphost=xxxxxxxx.com</span><br><span class="line"></span><br><span class="line">##################################################################</span><br><span class="line">target_Name=$&#123;FRAMEWORK_NAME&#125;</span><br><span class="line">xcodebuild -target $&#123;target_Name&#125; clean</span><br><span class="line"></span><br><span class="line"># 工程文件夹</span><br><span class="line">PROJECT_DIR=$&#123;SRCROOT&#125;</span><br><span class="line"># 系统生成的默认文件</span><br><span class="line">SYSTEM_DIR=build</span><br><span class="line"></span><br><span class="line">DIR_NAME=MergedFramework</span><br><span class="line"># 最终文件夹</span><br><span class="line">MERGED_DIR=$&#123;SRCROOT&#125;/$&#123;DIR_NAME&#125;/$&#123;FRAMEWORK_NAME&#125;.framework</span><br><span class="line"></span><br><span class="line"># 真机framework地址</span><br><span class="line">DEVICE_DIR=$&#123;SRCROOT&#125;/Release-iphoneos/$&#123;FRAMEWORK_NAME&#125;.framework</span><br><span class="line"># 模拟器framework地址</span><br><span class="line">SIMULATOR_DIR=$&#123;SRCROOT&#125;/Release-iphonesimulator/$&#123;FRAMEWORK_NAME&#125;.framework</span><br><span class="line"># 构建真机framework</span><br><span class="line">xcodebuild -configuration &quot;Release&quot; -target &quot;$&#123;SUB_FRAMEWORK_NAME&#125;&quot; -target &quot;$&#123;FRAMEWORK_NAME&#125;&quot; -sdk iphoneos clean build</span><br><span class="line"># 构建模拟器framework</span><br><span class="line">xcodebuild -configuration &quot;Release&quot; -target &quot;$&#123;SUB_FRAMEWORK_NAME&#125;&quot; -target &quot;$&#123;FRAMEWORK_NAME&#125;&quot; -sdk iphonesimulator clean build</span><br><span class="line"></span><br><span class="line"># 如果存在MERGED_DIR，删除</span><br><span class="line">if [ -d ./$&#123;MERGED_DIR&#125; ];then</span><br><span class="line">rm -rf ./$&#123;MERGED_DIR&#125;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">mkdir -p ./$&#123;MERGED_DIR&#125;</span><br><span class="line"></span><br><span class="line"># 复制真机包到自定义目录</span><br><span class="line">cp -R &quot;./$&#123;SYSTEM_DIR&#125;$&#123;DEVICE_DIR&#125;/&quot; &quot;.$&#123;PROJECT_DIR&#125;$&#123;MERGED_DIR&#125;/&quot;</span><br><span class="line"></span><br><span class="line"># framework中.a包合并</span><br><span class="line">lipo -create &quot;./$&#123;SYSTEM_DIR&#125;$&#123;DEVICE_DIR&#125;/$&#123;FRAMEWORK_NAME&#125;&quot; &quot;./$&#123;SYSTEM_DIR&#125;/$&#123;SIMULATOR_DIR&#125;/$&#123;FRAMEWORK_NAME&#125;&quot; -output &quot;.$&#123;PROJECT_DIR&#125;$&#123;MERGED_DIR&#125;/$&#123;FRAMEWORK_NAME&#125;&quot;</span><br><span class="line"></span><br><span class="line">rm -r ./$&#123;SYSTEM_DIR&#125;</span><br><span class="line"></span><br><span class="line"># 发邮件前删除之前的zip</span><br><span class="line">if [ -d ./ ];then</span><br><span class="line">rm -rf ./$&#123;DIR_NAME&#125;.zip</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"># 打zip压缩包</span><br><span class="line">zip -r $&#123;DIR_NAME&#125;.zip .$&#123;MERGED_DIR&#125;</span><br><span class="line"></span><br><span class="line"># 邮件附件</span><br><span class="line">file1_path=$&#123;DIR_NAME&#125;.zip</span><br><span class="line"></span><br><span class="line"># 邮件发送</span><br><span class="line">./sendEmail -f $&#123;email_sender&#125; -t $&#123;email_reciver&#125; -s $&#123;email_smtphost&#125; -u $&#123;email_title&#125; -xu $&#123;email_username&#125; -xp $&#123;email_password&#125; -m $&#123;email_content&#125; -a $&#123;file1_path&#125; -o message-charset=utf-8 -o message-file=$&#123;file1_path&#125;</span><br><span class="line"></span><br><span class="line"># 删除zip包</span><br><span class="line">if [ -d ./ ];then</span><br><span class="line">rm -rf ./$&#123;DIR_NAME&#125;.zip</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"># 输出framework架构</span><br><span class="line">echo &quot;\033[31m *********Architecture******** \033[0m&quot;</span><br><span class="line">lipo -info &quot;.$&#123;PROJECT_DIR&#125;$&#123;MERGED_DIR&#125;/$&#123;FRAMEWORK_NAME&#125;&quot;</span><br><span class="line">echo &quot;\033[31m *********Architecture******** \033[0m&quot;</span><br><span class="line"></span><br><span class="line"># 打开文件</span><br><span class="line">open &quot;.$&#123;MERGED_DIR&#125;&quot;</span><br></pre></td></tr></table></figure></p>
+<p>大概流程是将<code>OOO</code>和<code>CYFrame</code>分别进行真机和模拟器结构打包，将framework里的.a文件进行合并，然后拷贝真机的framework到自己目录，拷贝的framework里的.a替换成合并后的.a，将制作完的framework压缩成zip，进行邮件发送，并输出当前framework的架构<code>i386</code> <code>x86_64</code> <code>armv7</code> <code>arm64</code>,邮件发送借助的是<code>sendEmail</code>脚本</p>
+<p>需要注意的一点是打包脚本中被依赖的target要写在前面<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xcodebuild -configuration &quot;Release&quot; -target &quot;$&#123;SUB_FRAMEWORK_NAME&#125;&quot; -target &quot;$&#123;FRAMEWORK_NAME&#125;&quot; -sdk iphoneos clean build</span><br></pre></td></tr></table></figure></p>
+<p>脚本执行完后结果如图<br><img src="http://upload-images.jianshu.io/upload_images/9045592-55133f12fe59140e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照"></p>
+<p>此文章只是提供了一些思路，具体请款还需根据自己项目情况自行改写，如果此文章描述的不是特别清楚，请参考<a href="https://github.com/caoye/CYFrame" target="_blank" rel="noopener">DEMO</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/18/Framework脚本打包并分发(针对framework依赖了其他包的基础上)/" data-id="cja5jiq3o0002sojegvtbr0lq" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-通过VPS自行搭建Shadowsocks服务(科学上网)" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/18/通过VPS自行搭建Shadowsocks服务(科学上网)/" class="article-date">
+  <time datetime="2017-11-18T14:58:54.000Z" itemprop="datePublished">2017-11-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/18/通过VPS自行搭建Shadowsocks服务(科学上网)/">通过VPS自行搭建Shadowsocks服务(科学上网)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>最近貌似墙又加厚了，但是对于开发人员或者特殊群体来说，资料的查询是必不可少的，我们最熟悉的<a href="https://www.google.com.hk" target="_blank" rel="noopener">Google</a>都无法访问，也许这是一篇禁文，但是也许对想隔墙眺望的人有帮助</p>
+<p>国外有些优秀的VPS服务平台比如：<a href="https://bandwagonhost.com" target="_blank" rel="noopener">Bandwagon</a>、<a href="https://www.linode.com" target="_blank" rel="noopener">Linode</a>、<a href="https://www.digitalocean.com" target="_blank" rel="noopener">DigitalOcean</a>、<a href="https://www.vultr.com" target="_blank" rel="noopener">Vultr</a>,我的自建SS方案为:<code>VPS</code>(<a href="https://www.vultr.com/?ref=7246511" target="_blank" rel="noopener">Vultr</a>)+<code>Shadowsocks</code>+<code>加速器</code>，我选的是<a href="https://zh.wikipedia.org/wiki/CentOS" target="_blank" rel="noopener">CentOS</a>系统，系统的选择对搭建影响不大，主要是根据自己的熟悉程度去选择的，<code>Vultr</code>提供了<code>CentOS</code>、<code>CoreOS</code>、<code>Debian</code>、<code>Fedora</code>、<code>FreeBSD</code>、<code>OpenBSD</code>、<code>Ubuntu</code>、<code>Windows</code>系统提供你选择。</p>
+<p>如果聪明的你了解一些<code>Linux</code>操作系统，那再好不过了，不过也没关系，我这是一篇傻瓜式博文，即使你什么都不会，直接复制粘帖就可以完成最基本的搭建工作。</p>
+<p>首先打开<a href="https://www.vultr.com/?ref=7246511" target="_blank" rel="noopener">https://my.vultr.com</a>来完成<code>VPS</code>的购买和配置环节，</p>
+<h6 id="1-完成注册，并用邮件激活"><a href="#1-完成注册，并用邮件激活" class="headerlink" title="1. 完成注册，并用邮件激活"></a>1. 完成注册，并用邮件激活</h6><p>######2. 到个人中心完善资料</p>
+<p>######3.接下来是剁手环节了，选择一个你比较熟悉的支付方式，声明一下，这里假如你支付了$10，这并不是一个月的付费，而是假如你之后选择的服务器是$2.5/mon,那么你将可以使用4个月。<br><img src="http://upload-images.jianshu.io/upload_images/9045592-a14280dbe4b1eb39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>######4.选择配置生成服务器<br><img src="http://upload-images.jianshu.io/upload_images/9045592-11be6251904ed5a6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="节点选择（根据自己情况去选）"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/9045592-36f85cce66ad2fef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="系统选择（根据自己情况去选）"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/9045592-5a8d281452bc9145.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="付费服务选择（根据自己情况去选）"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/9045592-952f2910b7d3de84.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="附加功能选择（可不选）"></p>
+<p>都选择完后点击<a href="">Deploy Now</a>进行服务器部署，部署完后会分配一个服务器地址如下：<br><img src="http://upload-images.jianshu.io/upload_images/9045592-bb78d4f3a134aed4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="生成的服务器"></p>
+<p>点击进入会看到<br><img src="http://upload-images.jianshu.io/upload_images/9045592-a6f37cf37124213a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="屏幕快照 2017-11-16 11.10.38.png"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IP Address: xx.xx.xx.xx</span><br><span class="line">Uername: root</span><br><span class="line">Password: xxxxxxxxxx</span><br></pre></td></tr></table></figure>
+<h6 id="密码点击眼睛图标才可看到，如果点击眼睛看不到，换个浏览器查看，密码不要随便透露，这是登录服务器的密码。"><a href="#密码点击眼睛图标才可看到，如果点击眼睛看不到，换个浏览器查看，密码不要随便透露，这是登录服务器的密码。" class="headerlink" title="密码点击眼睛图标才可看到，如果点击眼睛看不到，换个浏览器查看，密码不要随便透露，这是登录服务器的密码。"></a>密码点击眼睛图标才可看到，如果点击眼睛看不到，换个浏览器查看，密码不要随便透露，这是登录服务器的密码。</h6><p>接下来我们查看一下部署的服务器是否能连接成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ ping 45.77.203.251</span><br><span class="line">输出结果是</span><br><span class="line">PING 45.77.203.251 (45.77.203.251): 56 data bytes</span><br><span class="line">64 bytes from 45.77.203.251: icmp_seq=0 ttl=42 time=451.760 ms</span><br><span class="line">64 bytes from 45.77.203.251: icmp_seq=1 ttl=42 time=342.720 ms</span><br><span class="line">64 bytes from 45.77.203.251: icmp_seq=2 ttl=43 time=229.505 ms</span><br><span class="line">64 bytes from 45.77.203.251: icmp_seq=3 ttl=43 time=317.966 ms</span><br><span class="line">64 bytes from 45.77.203.251: icmp_seq=4 ttl=42 time=229.370 ms</span><br><span class="line">^C</span><br><span class="line">--- 45.77.203.251 ping statistics ---</span><br><span class="line">5 packets transmitted, 5 packets received, 0.0% packet loss</span><br><span class="line">round-trip min/avg/max/stddev = 229.370/314.264/451.760/82.607 ms</span><br></pre></td></tr></table></figure></p>
+<p>代表服务器能正常连接,如果是<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">PING 45.77.207.90 (xx.xx.xx.xx): 56 data bytes</span><br><span class="line">Request timeout for icmp_seq 0</span><br><span class="line">Request timeout for icmp_seq 1</span><br><span class="line">Request timeout for icmp_seq 2</span><br><span class="line">Request timeout for icmp_seq 3</span><br><span class="line">Request timeout for icmp_seq 4</span><br><span class="line">--- 45.77.207.90 ping statistics ---</span><br><span class="line">6 packets transmitted, 0 packets received, 100.0% packet loss</span><br></pre></td></tr></table></figure></p>
+<p>说明服务器部署不成功，删掉重新创建一个试试</p>
+<p>######5.配置ssh（用于远程登录服务器）<br>如果你电脑已经生成过ssh的key，可以直接修改一下config文件即可。<br>如果从没有配置过，则首先在用户目录下创建一个<code>.ssh</code> 文件夹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ mkdir .ssh</span><br><span class="line">$ cd /.ssh</span><br><span class="line">$ ssh-keygen -t rsa -C xxxxxxxxxx@163.com</span><br></pre></td></tr></table></figure>
+<p>一路回车完后<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Generating public/private rsa key pair.</span><br><span class="line">Enter file in which to save the key (/Users/caoye/.ssh/id_rsa):</span><br><span class="line">Enter passphrase (empty for no passphrase):</span><br><span class="line">Enter same passphrase again:</span><br><span class="line">Your identification has been saved in /Users/caoye/.ssh/id_rsa.</span><br><span class="line">Your public key has been saved in /Users/caoye/.ssh/id_rsa.pub.</span><br><span class="line">The key fingerprint is:</span><br><span class="line">SHA256:PE8J2mhegoHmJ6H1lToq/gAcYLwBnUUuGVhcQumduCA 1595576349@qq.com</span><br><span class="line">The key&apos;s randomart image is:</span><br><span class="line">+---[RSA 2048]----+</span><br><span class="line">|=B=*+            |</span><br><span class="line">|+o=*   .         |</span><br><span class="line">| oXoo.o .        |</span><br><span class="line">|E*++o= = . .     |</span><br><span class="line">|+oo.* = S o      |</span><br><span class="line">|. .+ + o +       |</span><br><span class="line">|...   .   .      |</span><br><span class="line">|...              |</span><br><span class="line">| ...             |</span><br><span class="line">+----[SHA256]-----+</span><br></pre></td></tr></table></figure></p>
+<p>创建config文件<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vim config</span><br></pre></td></tr></table></figure></p>
+<p>将以下内容写入config并保存（Host填写你vutrl上创建服务器地址）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Host xx.xx.xx.xx</span><br><span class="line">Port 22</span><br><span class="line">User root</span><br><span class="line">Identityfile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure></p>
+<p>打开文件.ssh夹<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ open .</span><br></pre></td></tr></table></figure></p>
+<p>你会发现多了<code>config</code>、<code>id_rsa</code>、<code>id_rsa.pub</code>三个文件，其中<code>id_rsa.pub</code>为公钥，txt打开或者通过命令打开<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ vi id_rsa.pub</span><br></pre></td></tr></table></figure></p>
+<p>并拷贝<code>id_rsa.pub</code>里全部内容，将拷贝的内容添加到vultr上<br><img src="http://upload-images.jianshu.io/upload_images/9045592-b703631b1a63f88a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="ssh添加入口"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/9045592-16dab96be2bd1a18.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="点击添加即可"></p>
+<p>######6. 搭建SS服务<br>先登录服务器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ssh root@45.77.203.251</span><br></pre></td></tr></table></figure></p>
+<p>输入密码，使用ssh登录，输出结果为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">root@45.77.203.251&apos;s password:</span><br><span class="line">Last login: Sun Nov 12 17:08:01 2017 from 111.201.242.31</span><br><span class="line">[root@vultr ~]#</span><br></pre></td></tr></table></figure></p>
+<p>代表登录成功<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">安装</span><br><span class="line">$ yum install m2crypto python-setuptools</span><br><span class="line">$ easy_install pip</span><br><span class="line">$ pip install shadowsocks</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">配置</span><br><span class="line">vi  /etc/shadowsocks.json</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">内容为</span><br><span class="line">&#123;</span><br><span class="line">&quot;server&quot;:&quot;45.77.203.251&quot;,</span><br><span class="line">&quot;server_port&quot;:443,    // 可以自定义</span><br><span class="line">&quot;local_address&quot;: &quot;45.77.203.251&quot;,  // 与server一致</span><br><span class="line">&quot;local_port&quot;:1080,    // 默认1080</span><br><span class="line">&quot;password&quot;:&quot;xxxxxxx&quot;,</span><br><span class="line">&quot;timeout&quot;:300,</span><br><span class="line">&quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">&quot;fast_open&quot;: false</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">启动服务</span><br><span class="line">$ nohup ssserver -c /etc/shadowsocks.json &amp;</span><br></pre></td></tr></table></figure>
+<p>如果出现错误<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Traceback (most recent call last):</span><br><span class="line">File &quot;application.py&quot;, line 121, in &lt;module&gt;</span><br><span class="line">main()</span><br><span class="line">File &quot;application.py&quot;, line 117, in main</span><br><span class="line">http_server.listen(options.port)</span><br><span class="line">File &quot;/usr/local/lib/python2.7/site-packages/tornado-3.1-py2.7.egg/tornado/tcpserver.py&quot;, line 117, in listen</span><br><span class="line">sockets = bind_sockets(port, address=address)</span><br><span class="line">File &quot;/usr/local/lib/python2.7/site-packages/tornado-3.1-py2.7.egg/tornado/netutil.py&quot;, line 90, in bind_sockets</span><br><span class="line">sock.bind(sockaddr)</span><br><span class="line">File &quot;/usr/local/lib/python2.7/socket.py&quot;, line 224, in meth</span><br><span class="line">return getattr(self._sock,name)(*args)</span><br><span class="line">socket.error: [Errno 98] Address already in use</span><br></pre></td></tr></table></figure></p>
+<p>说明地址被占用，用命令查看启动中的服务<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ps</span><br></pre></td></tr></table></figure></p>
+<p>然后杀掉已经启用的<code>sserver</code>服务,类似这样<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ kill 230423</span><br></pre></td></tr></table></figure></p>
+<p>然后再重启<code>ssserver</code>服务。</p>
+<p>######7. 配置加速器<br>先安装几个小工具<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ yum install wget</span><br><span class="line">$ yum install zip unzip</span><br><span class="line">$ yum install gcc</span><br><span class="line">$ yum install net-tools</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm</span><br><span class="line">$ rpm -ivh epel-release-6-8.noarch.rpm</span><br><span class="line">$ yum install libnet libpcap libnet-devel libpcap-devel</span><br></pre></td></tr></table></figure>
+<p>安装完后查看<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ ls</span><br><span class="line">会有一个net-speeder-master文件夹</span><br></pre></td></tr></table></figure></p>
+<p>进入文件夹<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cd net-speeder-master</span><br><span class="line">$ ls</span><br></pre></td></tr></table></figure></p>
+<p>显示文件</p>
+<p><code>build.sh</code> <code>LICENSE</code>  <code>net_speeder</code>  <code>net_speeder.c</code>  <code>README.md</code>  <code>serverspeeder.sh</code><br>其中<code>build.sh</code>为可执行文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sh build.sh</span><br></pre></td></tr></table></figure>
+<p>通过之前安装的 <code>net-tools</code>查看路由<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ifconfig</span><br></pre></td></tr></table></figure></p>
+<p>输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500</span><br><span class="line">inet 45.77.203.251  netmask 255.255.254.0  broadcast 45.77.203.255</span><br><span class="line">inet6 fe80::5400:1ff:fe43:592f  prefixlen 64  scopeid 0x20&lt;link&gt;</span><br><span class="line">inet6 2001:19f0:5:1c69:5400:1ff:fe43:592f  prefixlen 64  scopeid 0x0&lt;global&gt;</span><br><span class="line">ether 56:00:01:43:59:2f  txqueuelen 1000  (Ethernet)</span><br><span class="line">RX packets 3371831  bytes 3464784787 (3.2 GiB)</span><br><span class="line">RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">TX packets 3056586  bytes 3270016123 (3.0 GiB)</span><br><span class="line">TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br><span class="line"></span><br><span class="line">lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536</span><br><span class="line">inet 127.0.0.1  netmask 255.0.0.0</span><br><span class="line">inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;</span><br><span class="line">loop  txqueuelen 1  (Local Loopback)</span><br><span class="line">RX packets 976  bytes 655677 (640.3 KiB)</span><br><span class="line">RX errors 0  dropped 0  overruns 0  frame 0</span><br><span class="line">TX packets 976  bytes 655677 (640.3 KiB)</span><br><span class="line">TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0</span><br></pre></td></tr></table></figure>
+<p>我们看看到路由是<code>eth0</code>类型，加速所有ip<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./net_speeder eth0 &quot;ip&quot;</span><br></pre></td></tr></table></figure></p>
+<p>然后下载安装并配置<code>Shadowsocks</code>客户端，就可以科学上网了。<br>附<code>Windows</code>,<code>Mac</code>下载地址：<a href="https://portal.shadowsocks.la/index.php?rp=/download" target="_blank" rel="noopener">Shadowsocks</a>。<br>Android、iPhone可直接配置服务器地址的免费客户端即可。</p>
+<p>后记：防火墙这篇文章里没有介绍和涉及，如果想添加防火墙的，请另外搜索<code>Firewall</code>文章去设置</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/18/通过VPS自行搭建Shadowsocks服务(科学上网)/" data-id="cja5jiq420003soje8l5x0ukc" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-Json自动转Model的思路" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/11/18/Json自动转Model的思路/" class="article-date">
+  <time datetime="2017-11-18T14:58:54.000Z" itemprop="datePublished">2017-11-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2017/11/18/Json自动转Model的思路/">Json自动转Model的思路</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>本篇文章只是单纯的介绍model转换的基本思路希望能帮助其他人研读第三方，借鉴<a href="https://github.com/ibireme/YYModel" target="_blank" rel="noopener">YYModel</a>和<a href="https://github.com/realm/realm-cocoa" target="_blank" rel="noopener">Realm</a>的model转换思路，很早以前的<a href="https://github.com/caoye/MappingModel" target="_blank" rel="noopener">Demo</a>里还有很多容错没做</p>
+<p>model自动映射的大体流程为</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/9045592-4576974b9fdf64eb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="流程图.png"></p>
+<h2 id="如何进行赋值？"><a href="#如何进行赋值？" class="headerlink" title="如何进行赋值？"></a>如何进行赋值？</h2><ul>
+<li>先要获取当前model的所有属性</li>
+</ul>
+<p><code>uint propertyCount;
+objc_property_t *ps = class_copyPropertyList([objeClass class], &amp;propertyCount);</code></p>
+<p>找到任意一个属性获取它的详细信息我们看一下<br><code>objc_property_t property = ps[i];
+const char *propertyName = property_getName(property);
+const char *propertyAttributes = property_getAttributes(property);
+NSString *type = [NSString stringWithUTF8String:propertyAttributes];</code></p>
+<p>打印出 <strong>type</strong> 为<code>T@&quot;NSString&quot;,C,N,V_name</code>。</p>
+<ul>
+<li>其中<code>T</code>，属性总是以T开头.</li>
+<li><code>@&quot;NSString&quot;</code>代表属性的类型，如果是数组则为<code>@&quot;NSArray&quot;</code>，<code>@</code>表示为是一个对象，不是基本数据类型</li>
+<li><code>C</code>表示属性为copy类型</li>
+<li><code>N</code>表示nonatomic</li>
+<li><code>V_name</code>为属性变量property的名字</li>
+</ul>
+<p>@property (readonly, copy, nonatomic) NSString * name;<br>它的详细内容为<code>T@&quot;NSString&quot;,R,C,N,V_name</code><br>如果将该属性设置为<code>@dynamic</code>,则详细内容则变为<code>T@&quot;NSString&quot;,C,D,N</code></p>
+<p>协议属性@property (nonatomic, strong) NSArray <submodel>* their<br>，的表示为<code>T@&quot;NSArray&lt;SubModel&gt;&quot;,&amp;,N,V_theArr</code><br>如果想了解全部定义规则<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html" target="_blank" rel="noopener">查看全部</a> 。</submodel></p>
+<p>根据属性的描述信息，我们可以得到属性的类型(T后面的第一个字符)，比如<code>@</code>代表的是对象类型, 可参照<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html" target="_blank" rel="noopener">查看全部</a><br>如下是对应关系</p>
+<ul>
+<li><code>v</code>-&gt;<code>Void</code></li>
+<li><code>B</code>-&gt;<code>Bool</code></li>
+<li><code>c</code>-&gt;<code>Int8</code></li>
+<li><code>C</code>-&gt;<code>UInt8</code></li>
+<li><code>s</code>-&gt;<code>Int16</code></li>
+<li><code>S</code>-&gt;<code>UInt16</code></li>
+<li><code>i</code>-&gt;<code>Int32</code></li>
+<li><code>I</code>-&gt;<code>UInt32</code></li>
+<li><code>l</code>-&gt;<code>Int32</code></li>
+<li><code>L</code>-&gt;<code>UInt32</code></li>
+<li><code>q</code>-&gt;<code>Int64</code></li>
+<li><code>Q</code>-&gt;<code>UInt64</code></li>
+<li><code>f</code>-&gt;<code>Float</code></li>
+<li><code>d</code>-&gt;<code>Double</code></li>
+<li><code>D</code>-&gt;<code>Long</code></li>
+<li><code>#</code>-&gt;<code>Class</code></li>
+<li><code>:</code>-&gt;<code>SEL</code></li>
+<li><code>*</code>-&gt;<code>CFString</code></li>
+<li><code>^</code>-&gt;<code>Pointer</code></li>
+<li><code>[</code>-&gt;<code>CFArray</code></li>
+<li><code>(</code>-&gt;<code>Union</code></li>
+<li><code>{</code>-&gt;<code>Struct</code></li>
+<li><code>@</code>-&gt;<code>对象类型（Object）</code></li>
+</ul>
+<p>其中<code>对象类型（Object</code>中又包含了很多类型<code>NSString</code>、<code>NSMutableString</code>、<code>NSDictionary</code>、<code>NSMutableDictionary</code>、<code>NSArray</code>、<code>NSMutableArray</code>、<code>NSSet</code>、<code>NSMutableSet</code>、<code>NSData</code>、<code>NSMutableData</code>、<code>NSDate</code>、<code>NSNumber</code>、<code>NSDecimalNumber</code>、<code>NSURL</code>、<code>NSValue</code>、<code>NSProtocol</code></p>
+<p>根据这些我们可以分别根据属性的类型去做相应的处理，除了这些类型，还有我们自定义的类型，比如<code>@property (nonatomic, strong) ChildModel * child;</code><br>这种类型也需要我们单独处理。</p>
+<p>属性的<code>set</code>、<code>get</code>方法我也也能得到（根据属性名字）<br>对属性赋值的时候我们可以通过（提供2种方法）赋值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSNumber *number = (NSNumber *)value;</span><br><span class="line">void (*func)(id, SEL, NSNumber *) = (void *)imp;</span><br><span class="line">func(currentClass, sel, number);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NSNumber *number = (NSNumber *)value;</span><br><span class="line">[currentClass performSelectorOnMainThread: sel                                    withObject:number waitUntilDone:[NSThread isMainThread]];</span><br></pre></td></tr></table></figure>
+<p>这样属性的类型，我们就确定了，dynamic标示的类型我们不需要解析，Array类型我们遍历去解析，Dictionary类型我们直接根据属性赋值</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/11/18/Json自动转Model的思路/" data-id="cja5jiq440004sojevn9r9y4t" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/11/18/Cocoapods镜像制作/">Cocoapods镜像制作</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/18/Framework脚本打包并分发(针对framework依赖了其他包的基础上)/">Framework脚本打包并分发(针对framework依赖了其他包的基础上)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/18/通过VPS自行搭建Shadowsocks服务(科学上网)/">通过VPS自行搭建Shadowsocks服务(科学上网)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/11/18/Json自动转Model的思路/">Json自动转Model的思路</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 caoye<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
