@@ -79,17 +79,19 @@
 
 
 
-<meta name="description" content="1SDFAFASDFASDFASDFS">
+<meta name="description" content="本篇文章只是单纯的介绍model转换的基本思路希望能帮助其他人研读第三方，借鉴YYModel和Realm的model转换思路，很早以前的Demo里还有很多容错没做 model自动映射的大体流程为  如何进行赋值？ 先要获取当前model的所有属性  uint propertyCount; objc_property_t">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://yoursite.com/2017/11/18/first/index.html">
+<meta property="og:title" content="Json自动转Model的思路">
+<meta property="og:url" content="http://yoursite.com/2017/11/18/Json自动转Model的思路/index.html">
 <meta property="og:site_name" content="first">
-<meta property="og:description" content="1SDFAFASDFASDFASDFS">
+<meta property="og:description" content="本篇文章只是单纯的介绍model转换的基本思路希望能帮助其他人研读第三方，借鉴YYModel和Realm的model转换思路，很早以前的Demo里还有很多容错没做 model自动映射的大体流程为  如何进行赋值？ 先要获取当前model的所有属性  uint propertyCount; objc_property_t *ps = class_copyPropertyList([objeClass">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-11-18T15:08:22.000Z">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/9045592-4576974b9fdf64eb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-11-18T15:47:23.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="1SDFAFASDFASDFASDFS">
+<meta name="twitter:title" content="Json自动转Model的思路">
+<meta name="twitter:description" content="本篇文章只是单纯的介绍model转换的基本思路希望能帮助其他人研读第三方，借鉴YYModel和Realm的model转换思路，很早以前的Demo里还有很多容错没做 model自动映射的大体流程为  如何进行赋值？ 先要获取当前model的所有属性  uint propertyCount; objc_property_t *ps = class_copyPropertyList([objeClass">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/9045592-4576974b9fdf64eb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
 
 
 
@@ -119,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/11/18/first/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/11/18/Json自动转Model的思路/"/>
 
 
 
 
 
-  <title>Hello World | first</title>
+  <title>Json自动转Model的思路 | first</title>
   
 
 
@@ -232,7 +234,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/18/first/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/18/Json自动转Model的思路/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="caoye">
@@ -249,7 +251,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World</h1>
+          <h1 class="post-title" itemprop="name headline">Json自动转Model的思路</h1>
         
 
         <div class="post-meta">
@@ -299,7 +301,60 @@
       
 
       
-        <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SDFAFASDFASDFASDFS</span><br></pre></td></tr></table></figure>
+        <p>本篇文章只是单纯的介绍model转换的基本思路希望能帮助其他人研读第三方，借鉴<a href="https://github.com/ibireme/YYModel" target="_blank" rel="noopener">YYModel</a>和<a href="https://github.com/realm/realm-cocoa" target="_blank" rel="noopener">Realm</a>的model转换思路，很早以前的<a href="https://github.com/caoye/MappingModel" target="_blank" rel="noopener">Demo</a>里还有很多容错没做</p>
+<p>model自动映射的大体流程为</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/9045592-4576974b9fdf64eb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="流程图.png"></p>
+<h2 id="如何进行赋值？"><a href="#如何进行赋值？" class="headerlink" title="如何进行赋值？"></a>如何进行赋值？</h2><ul>
+<li>先要获取当前model的所有属性</li>
+</ul>
+<p><code>uint propertyCount;
+objc_property_t *ps = class_copyPropertyList([objeClass class], &amp;propertyCount);</code></p>
+<p>找到任意一个属性获取它的详细信息我们看一下<br><code>objc_property_t property = ps[i];
+const char *propertyName = property_getName(property);
+const char *propertyAttributes = property_getAttributes(property);
+NSString *type = [NSString stringWithUTF8String:propertyAttributes];</code></p>
+<p>打印出 <strong>type</strong> 为<code>T@&quot;NSString&quot;,C,N,V_name</code>。</p>
+<ul>
+<li>其中<code>T</code>，属性总是以T开头.</li>
+<li><code>@&quot;NSString&quot;</code>代表属性的类型，如果是数组则为<code>@&quot;NSArray&quot;</code>，<code>@</code>表示为是一个对象，不是基本数据类型</li>
+<li><code>C</code>表示属性为copy类型</li>
+<li><code>N</code>表示nonatomic</li>
+<li><code>V_name</code>为属性变量property的名字</li>
+</ul>
+<p>@property (readonly, copy, nonatomic) NSString * name;<br>它的详细内容为<code>T@&quot;NSString&quot;,R,C,N,V_name</code><br>如果将该属性设置为<code>@dynamic</code>,则详细内容则变为<code>T@&quot;NSString&quot;,C,D,N</code></p>
+<p>协议属性@property (nonatomic, strong) NSArray <submodel>* their<br>，的表示为<code>T@&quot;NSArray&lt;SubModel&gt;&quot;,&amp;,N,V_theArr</code><br>如果想了解全部定义规则<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html" target="_blank" rel="noopener">查看全部</a> 。</submodel></p>
+<p>根据属性的描述信息，我们可以得到属性的类型(T后面的第一个字符)，比如<code>@</code>代表的是对象类型, 可参照<a href="https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html" target="_blank" rel="noopener">查看全部</a><br>如下是对应关系</p>
+<ul>
+<li><code>v</code>-&gt;<code>Void</code></li>
+<li><code>B</code>-&gt;<code>Bool</code></li>
+<li><code>c</code>-&gt;<code>Int8</code></li>
+<li><code>C</code>-&gt;<code>UInt8</code></li>
+<li><code>s</code>-&gt;<code>Int16</code></li>
+<li><code>S</code>-&gt;<code>UInt16</code></li>
+<li><code>i</code>-&gt;<code>Int32</code></li>
+<li><code>I</code>-&gt;<code>UInt32</code></li>
+<li><code>l</code>-&gt;<code>Int32</code></li>
+<li><code>L</code>-&gt;<code>UInt32</code></li>
+<li><code>q</code>-&gt;<code>Int64</code></li>
+<li><code>Q</code>-&gt;<code>UInt64</code></li>
+<li><code>f</code>-&gt;<code>Float</code></li>
+<li><code>d</code>-&gt;<code>Double</code></li>
+<li><code>D</code>-&gt;<code>Long</code></li>
+<li><code>#</code>-&gt;<code>Class</code></li>
+<li><code>:</code>-&gt;<code>SEL</code></li>
+<li><code>*</code>-&gt;<code>CFString</code></li>
+<li><code>^</code>-&gt;<code>Pointer</code></li>
+<li><code>[</code>-&gt;<code>CFArray</code></li>
+<li><code>(</code>-&gt;<code>Union</code></li>
+<li><code>{</code>-&gt;<code>Struct</code></li>
+<li><code>@</code>-&gt;<code>对象类型（Object）</code></li>
+</ul>
+<p>其中<code>对象类型（Object</code>中又包含了很多类型<code>NSString</code>、<code>NSMutableString</code>、<code>NSDictionary</code>、<code>NSMutableDictionary</code>、<code>NSArray</code>、<code>NSMutableArray</code>、<code>NSSet</code>、<code>NSMutableSet</code>、<code>NSData</code>、<code>NSMutableData</code>、<code>NSDate</code>、<code>NSNumber</code>、<code>NSDecimalNumber</code>、<code>NSURL</code>、<code>NSValue</code>、<code>NSProtocol</code></p>
+<p>根据这些我们可以分别根据属性的类型去做相应的处理，除了这些类型，还有我们自定义的类型，比如<code>@property (nonatomic, strong) ChildModel * child;</code><br>这种类型也需要我们单独处理。</p>
+<p>属性的<code>set</code>、<code>get</code>方法我也也能得到（根据属性名字）<br>对属性赋值的时候我们可以通过（提供2种方法）赋值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">NSNumber *number = (NSNumber *)value;</span><br><span class="line">void (*func)(id, SEL, NSNumber *) = (void *)imp;</span><br><span class="line">func(currentClass, sel, number);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NSNumber *number = (NSNumber *)value;</span><br><span class="line">[currentClass performSelectorOnMainThread: sel                                    withObject:number waitUntilDone:[NSThread isMainThread]];</span><br></pre></td></tr></table></figure>
+<p>这样属性的类型，我们就确定了，dynamic标示的类型我们不需要解析，Array类型我们遍历去解析，Dictionary类型我们直接根据属性赋值</p>
 
       
     </div>
@@ -333,6 +388,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/18/Framework脚本打包并分发(针对framework依赖了其他包的基础上)/" rel="prev" title="Framework脚本打包并分发(针对framework依赖了其他包的基础上)">
+                Framework脚本打包并分发(针对framework依赖了其他包的基础上) <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -384,8 +443,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -400,7 +468,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">2</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -429,6 +497,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何进行赋值？"><span class="nav-number">1.</span> <span class="nav-text">如何进行赋值？</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
